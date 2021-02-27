@@ -196,12 +196,23 @@ func (s *Scanner) detectAuthMethod(stream Stream) int {
 		stream.Route(),
 	)
 
+    attackURL2 := fmt.Sprintf(
+		"rtsp://[%s]:%d/%s",
+		stream.Address,
+		stream.Port,
+		stream.Route(),
+	)
+
 	s.setCurlOptions(c)
 
 	// Send a request to the URL of the stream we want to attack.
 	_ = c.Setopt(curl.OPT_URL, attackURL)
 	// Set the RTSP STREAM URI as the stream URL.
-	_ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
+	if s.ipv6{
+	  _ = c.Setopt(curl.OPT_URL, attackURL2)
+    }else{
+      _ = c.Setopt(curl.OPT_URL, attackURL)
+    }
 	_ = c.Setopt(curl.OPT_RTSP_REQUEST, rtspDescribe)
 
 	// Perform the request.
@@ -235,7 +246,14 @@ func (s *Scanner) routeAttack(stream Stream, route string) bool {
 		stream.Port,
 		route,
 	)
-
+	attackURL2 := fmt.Sprintf(
+		"rtsp://%s:%s@[%s]:%d/%s",
+		stream.Username,
+		stream.Password,
+		stream.Address,
+		stream.Port,
+		route,
+	)
 	s.setCurlOptions(c)
 
 	// Set proper authentication type.
@@ -243,7 +261,11 @@ func (s *Scanner) routeAttack(stream Stream, route string) bool {
 	_ = c.Setopt(curl.OPT_USERPWD, fmt.Sprint(stream.Username, ":", stream.Password))
 
 	// Send a request to the URL of the stream we want to attack.
-	_ = c.Setopt(curl.OPT_URL, attackURL)
+	if s.ipv6{
+	  _ = c.Setopt(curl.OPT_URL, attackURL2)
+    }else{
+      _ = c.Setopt(curl.OPT_URL, attackURL)
+    }
 	// Set the RTSP STREAM URI as the stream URL.
 	_ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
 	_ = c.Setopt(curl.OPT_RTSP_REQUEST, rtspDescribe)
@@ -284,6 +306,14 @@ func (s *Scanner) credAttack(stream Stream, username string, password string) bo
 		stream.Port,
 		stream.Route(),
 	)
+    attackURL2 := fmt.Sprintf(
+		"rtsp://%s:%s@[%s]:%d/%s",
+		username,
+		password,
+		stream.Address,
+		stream.Port,
+		stream.Route(),
+	)
 
 	s.setCurlOptions(c)
 
@@ -292,7 +322,11 @@ func (s *Scanner) credAttack(stream Stream, username string, password string) bo
 	_ = c.Setopt(curl.OPT_USERPWD, fmt.Sprint(username, ":", password))
 
 	// Send a request to the URL of the stream we want to attack.
-	_ = c.Setopt(curl.OPT_URL, attackURL)
+	if s.ipv6{
+	  _ = c.Setopt(curl.OPT_URL, attackURL2)
+    }else{
+      _ = c.Setopt(curl.OPT_URL, attackURL)
+    }
 	// Set the RTSP STREAM URI as the stream URL.
 	_ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
 	_ = c.Setopt(curl.OPT_RTSP_REQUEST, rtspDescribe)
@@ -334,7 +368,14 @@ func (s *Scanner) validateStream(stream Stream) bool {
 		stream.Port,
 		stream.Route(),
 	)
-
+    attackURL2 := fmt.Sprintf(
+		"rtsp://%s:%s@[%s]:%d/%s",
+		stream.Username,
+		stream.Password,
+		stream.Address,
+		stream.Port,
+		stream.Route(),
+	)
 	s.setCurlOptions(c)
 
 	// Set proper authentication type.
@@ -342,7 +383,11 @@ func (s *Scanner) validateStream(stream Stream) bool {
 	_ = c.Setopt(curl.OPT_USERPWD, fmt.Sprint(stream.Username, ":", stream.Password))
 
 	// Send a request to the URL of the stream we want to attack.
-	_ = c.Setopt(curl.OPT_URL, attackURL)
+	if s.ipv6{
+	  _ = c.Setopt(curl.OPT_URL, attackURL2)
+    }else{
+      _ = c.Setopt(curl.OPT_URL, attackURL)
+    }
 	// Set the RTSP STREAM URI as the stream URL.
 	_ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
 	_ = c.Setopt(curl.OPT_RTSP_REQUEST, rtspSetup)
