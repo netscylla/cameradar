@@ -27,6 +27,17 @@ func (s *Scanner) Scan() ([]Stream, error) {
 		nmap.WithTargets(s.targets...),
 		nmap.WithPorts(s.ports...),
 		nmap.WithServiceInfo(),
+		nmap.WithTimingTemplate(nmap.Timing(s.scanSpeed)),		
+	)
+	
+	if err != nil {
+		return nil, s.term.FailStepf("unable to create network scanner: %v", err)
+	}
+
+	nmapScanner2, err := nmap.NewScanner(
+		nmap.WithTargets(s.targets...),
+		nmap.WithPorts(s.ports...),
+		nmap.WithServiceInfo(),
 		nmap.WithTimingTemplate(nmap.Timing(s.scanSpeed)),
 		nmap.WithIPv6Scanning(),
 	)
@@ -35,21 +46,10 @@ func (s *Scanner) Scan() ([]Stream, error) {
 		return nil, s.term.FailStepf("unable to create network scanner: %v", err)
 	}
 
-    nmapScanner2, err := nmap.NewScanner(
-		nmap.WithTargets(s.targets...),
-		nmap.WithPorts(s.ports...),
-		nmap.WithServiceInfo(),
-		nmap.WithTimingTemplate(nmap.Timing(s.scanSpeed)),
-	)
-	
-	if err != nil {
-		return nil, s.term.FailStepf("unable to create network scanner: %v", err)
-	}
-
     if s.ipv6{
-	  return s.scan(nmapScanner)
+      return s.scan(nmapScanner2)
     }else{
-      return s.scan(nmapScanner2)	
+      return s.scan(nmapScanner)	
     }
 }
 
