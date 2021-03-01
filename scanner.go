@@ -24,6 +24,7 @@ type Scanner struct {
 	targets                  []string
 	ports                    []string
 	ipv6					 bool
+	skip                     bool
 	debug                    bool
 	verbose                  bool
 	scanSpeed                int
@@ -117,6 +118,12 @@ func WithDebug(debug bool) func(s *Scanner) {
 func WithIPv6(ipv6 bool) func(s *Scanner) {
 	return func(s *Scanner) {
 		s.ipv6 = ipv6
+	}
+}
+
+func WithSkipdiscovery(skip bool) func(s *Scanner) {
+	return func(s *Scanner) {
+		s.skip = skip
 	}
 }
 

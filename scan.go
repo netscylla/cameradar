@@ -2,7 +2,7 @@ package cameradar
 
 import (
 	"strings"
-
+    "strconv"
 	"github.com/Ullaakut/nmap"
 )
 
@@ -54,18 +54,21 @@ func (s *Scanner) Scan() ([]Stream, error) {
 }
 
 func (s *Scanner) scan(nmapScanner nmap.ScanRunner) ([]Stream, error) {
-	results, warnings, err := nmapScanner.Run()
-	if err != nil {
-		return nil, s.term.FailStepf("error while scanning network: %v", err)
-	}
 
-	for _, warning := range warnings {
-		s.term.Infoln("[Nmap Warning]", warning)
-	}
+    var streams []Stream
 
-	// Get streams from nmap results.
-	var streams []Stream
-	for _, host := range results.Hosts {
+	if !s.skip {
+	    results, warnings, err := nmapScanner.Run()
+	    if err != nil {
+		    return nil, s.term.FailStepf("error while scanning network: %v", err)
+	    }
+
+	    for _, warning := range warnings {
+		    s.term.Infoln("[Nmap Warning]", warning)
+	    }
+    
+	    // Get streams from nmap results.
+	    for _, host := range results.Hosts {
 		for _, port := range host.Ports {
 			if port.Status() != "open" {
 				continue
@@ -83,7 +86,22 @@ func (s *Scanner) scan(nmapScanner nmap.ScanRunner) ([]Stream, error) {
 				})
 			}
 		}
-	}
+		}
+		}else{
+			//skip scan
+			s.term.Infoln("[Skip Discovery Initiated - using values specified]")
+			i, err := strconv.Atoi(s.ports[0])
+			if err != nil || i > 65535 || i < 0 {
+		        return nil, s.term.FailStepf("error port is not uint16 value: %v", err)
+	        }
+			for _, host := range s.targets {
+				streams = append(streams, Stream{
+					Device:  "null",
+					Address: host,
+					Port:    uint16(i),
+				})
+			}
+		}
 
 	s.term.Debugf("Found %d RTSP streams\n", len(streams))
 
