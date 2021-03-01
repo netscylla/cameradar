@@ -46,11 +46,11 @@ func (s *Scanner) Scan() ([]Stream, error) {
 		return nil, s.term.FailStepf("unable to create network scanner: %v", err)
 	}
 
-    if s.ipv6{
-      return s.scan(nmapScanner2)
-    }else{
-      return s.scan(nmapScanner)	
-    }
+        if s.ipv6{
+               return s.scan(nmapScanner2)
+        }else{
+               return s.scan(nmapScanner)	
+        }
 }
 
 func (s *Scanner) scan(nmapScanner nmap.ScanRunner) ([]Stream, error) {
