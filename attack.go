@@ -206,19 +206,22 @@ func (s *Scanner) detectAuthMethod(stream Stream) int {
 	s.setCurlOptions(c)
 
 	// Send a request to the URL of the stream we want to attack.
-	_ = c.Setopt(curl.OPT_URL, attackURL)
-	// Set the RTSP STREAM URI as the stream URL.
 	if s.ipv6{
 	    _ = c.Setopt(curl.OPT_URL, attackURL2)
-        }else{
-            _ = c.Setopt(curl.OPT_URL, attackURL)
-        }
+    }else{
+        _ = c.Setopt(curl.OPT_URL, attackURL)
+    }
+    // Set the RTSP STREAM URI as the stream URL.
 	_ = c.Setopt(curl.OPT_RTSP_REQUEST, rtspDescribe)
 
 	// Perform the request.
 	err := c.Perform()
 	if err != nil {
-		s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL, stream.AuthenticationType, err)
+		if s.ipv6{
+		    s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL2, stream.AuthenticationType, err)
+	    }else{
+	    	s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL, stream.AuthenticationType, err)
+	    }
 		return -1
 	}
 
@@ -263,17 +266,23 @@ func (s *Scanner) routeAttack(stream Stream, route string) bool {
 	// Send a request to the URL of the stream we want to attack.
 	if s.ipv6{
 	    _ = c.Setopt(curl.OPT_URL, attackURL2)
-        }else{
-            _ = c.Setopt(curl.OPT_URL, attackURL)
-        }
-	// Set the RTSP STREAM URI as the stream URL.
-	_ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
+	    // Set the RTSP STREAM URI as the stream URL.
+	    _ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL2)
+    }else{
+        _ = c.Setopt(curl.OPT_URL, attackURL)
+        // Set the RTSP STREAM URI as the stream URL.
+	    _ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
+    }
 	_ = c.Setopt(curl.OPT_RTSP_REQUEST, rtspDescribe)
 
 	// Perform the request.
 	err := c.Perform()
 	if err != nil {
-		s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL, stream.AuthenticationType, err)
+		if s.ipv6{
+		    s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL2, stream.AuthenticationType, err)
+		}else{
+			s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL, stream.AuthenticationType, err)
+		}
 		return false
 	}
 
@@ -324,17 +333,24 @@ func (s *Scanner) credAttack(stream Stream, username string, password string) bo
 	// Send a request to the URL of the stream we want to attack.
 	if s.ipv6{
 	    _ = c.Setopt(curl.OPT_URL, attackURL2)
-        }else{
-            _ = c.Setopt(curl.OPT_URL, attackURL)
-        }
+	    // Set the RTSP STREAM URI as the stream URL.
+	    _ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL2)
+    }else{
+        _ = c.Setopt(curl.OPT_URL, attackURL)
+        // Set the RTSP STREAM URI as the stream URL.
+        _ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
+    }
 	// Set the RTSP STREAM URI as the stream URL.
-	_ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
 	_ = c.Setopt(curl.OPT_RTSP_REQUEST, rtspDescribe)
 
 	// Perform the request.
 	err := c.Perform()
 	if err != nil {
-		s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL, stream.AuthenticationType, err)
+		if s.ipv6{
+		    s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL2, stream.AuthenticationType, err)
+		}else{
+			s.term.Errorf("Perform failed for %q (auth %d): %v", attackURL, stream.AuthenticationType, err)
+		}
 		return false
 	}
 
@@ -385,11 +401,13 @@ func (s *Scanner) validateStream(stream Stream) bool {
 	// Send a request to the URL of the stream we want to attack.
 	if s.ipv6{
 	    _ = c.Setopt(curl.OPT_URL, attackURL2)
-        }else{
-            _ = c.Setopt(curl.OPT_URL, attackURL)
-        }
-	// Set the RTSP STREAM URI as the stream URL.
-	_ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
+	    // Set the RTSP STREAM URI as the stream URL.
+	    _ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL2)
+    }else{
+        _ = c.Setopt(curl.OPT_URL, attackURL)
+        // Set the RTSP STREAM URI as the stream URL.
+        _ = c.Setopt(curl.OPT_RTSP_STREAM_URI, attackURL)
+    }
 	_ = c.Setopt(curl.OPT_RTSP_REQUEST, rtspSetup)
 
 	_ = c.Setopt(curl.OPT_RTSP_TRANSPORT, "RTP/AVP;unicast;client_port=33332-33333")
